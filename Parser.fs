@@ -31,8 +31,7 @@ let splitExpr tokens =
 
     loop tokens ([], [])
 
-let rec parseExpr tokens =
-    match tokens with
+let rec parseExpr = function
     | Expression (op, tail) -> Some(Set(op, parseArgs tail))
     | _ -> None
 and parseArgs tokens =
