@@ -51,13 +51,15 @@ Either run on native host, or run in container
 1. Download and install dotnet core 3.0 runtime or sdk: https://dotnet.microsoft.com/download/dotnet-core/3.0
 2. Add `dotnet` executable to path
 
-    $ dotnet publish --configuration Release -r linux-x64 --self-contained --nologo -o bin /p:PublishSingleFile=true
-    Restore completed in 369.53 ms
+```shell
+$ dotnet publish --configuration Release -r linux-x64 --self-contained --nologo -o bin /p:PublishSingleFile=true
+Restore completed in 369.53 ms
 
-    $ bin/sets_calc [ SUM [ DIF a.txt b.txt c.txt ] [ INT b.txt c.txt ] ]
-    1
-    3
-    4
+$ bin/sets_calc [ SUM [ DIF a.txt b.txt c.txt ] [ INT b.txt c.txt ] ]
+1
+3
+4
+```
 
 ### Running tests
 
