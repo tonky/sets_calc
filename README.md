@@ -52,6 +52,7 @@ Either run on native host, or run in container
 2. Add `dotnet` executable to path
 
     $ dotnet publish --configuration Release -r linux-x64 --self-contained --nologo -o bin /p:PublishSingleFile=true
+    Restore completed in 369.53 ms
 
     $ bin/sets_calc [ SUM [ DIF a.txt b.txt c.txt ] [ INT b.txt c.txt ] ]
     1
