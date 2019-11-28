@@ -9,9 +9,6 @@ let tokenize (input: string) =
 let checkParse str lst =
     match tokenize str with
     | Expression(exp, []) ->
-        // printfn "parsed: %A" exp
-        // printfn "eval  : %A" (eval exp)
-        // printfn "diff  : %A" (Set.difference (eval exp) (Set.ofList lst))
         Assert.True(Set.isEmpty (Set.difference (eval exp) (Set.ofList lst)))
     | _ -> failwith("didn't parse")
 

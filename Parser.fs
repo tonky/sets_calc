@@ -33,7 +33,7 @@ and (|Args|_|) = function
     | _ -> None
 
 let loadFile name =
-    let lines = List.ofSeq (System.IO.File.ReadLines(__SOURCE_DIRECTORY__ + "/" + name))
+    let lines = List.ofSeq (IO.File.ReadLines(__SOURCE_DIRECTORY__ + "/" + name))
     Set.ofList (List.map Int32.Parse lines)
 
 let rec eval = function
