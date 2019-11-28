@@ -1,7 +1,6 @@
 module Parser
 
 open System
-open System.Text.RegularExpressions
 
 type Op = Sum | Int | Diff
 
@@ -9,18 +8,10 @@ type Expr =
     | Data of string
     | Set of Op * Expr list
 
-let (|Filename|_|) input =
-   let m = Regex.Match(input,"(\w+\.\w{3})") 
-   if (m.Success) then Some m.Groups.[0].Value else None  
-
 let (|Op|_|) = function
     | "SUM" -> Some(Sum)
     | "INT" -> Some(Int)
     | "DIF" -> Some(Diff)
-    | _ -> None
-
-let (|Datafile|_|) = function
-    | Filename f :: tail -> Some(Data(f), tail)
     | _ -> None
 
 let rec (|Expression|_|) = function
@@ -28,8 +19,8 @@ let rec (|Expression|_|) = function
     | _ -> None
 and (|Args|_|) = function
     | "]" :: tail -> Some([], tail)
-    | Datafile(f, Args(args, tail)) -> Some(f :: args, tail)
     | Expression(e, Args(args, tail)) -> Some(e :: args, tail)
+    | f :: Args(args, tail) -> Some(Data(f) :: args, tail)
     | _ -> None
 
 let loadFile name =

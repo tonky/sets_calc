@@ -29,4 +29,4 @@ let ``Basic ops combinations`` () =
 let ``Other tests`` () =
     checkParse "[ SUM [ DIF a.txt b.txt c.txt ] [ INT b.txt c.txt ] ]" [1;3;4]
     checkParse "[ DIF a.txt [ SUM b.txt c.txt ] [ INT a.txt b.txt ] c.txt b.txt ]" [1]
-    checkParse "[ SUM a.txt [ INT a.txt b.txt ] a.txt] ]" [1;2;3]
+    checkParse "[ SUM a.txt [ INT a.txt b.txt ] a.txt ]" [1;2;3]
