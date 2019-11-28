@@ -13,39 +13,27 @@ let (|Filename|_|) input =
    let m = Regex.Match(input,"(\w+\.\w{3})") 
    if (m.Success) then Some m.Groups.[0].Value else None  
 
-let (|Expression|_|) = function
-    | "[" :: "SUM" :: tail -> Some(Sum, tail)
-    | "[" :: "INT" :: tail -> Some(Int, tail)
-    | "[" :: "DIF" :: tail -> Some(Diff, tail)
+let (|Op|_|) = function
+    | "SUM" -> Some(Sum)
+    | "INT" -> Some(Int)
+    | "DIF" -> Some(Diff)
     | _ -> None
 
-let splitExpr tokens =
-    let count x = Seq.filter ((=) x) >> Seq.length
-
-    let rec loop l (xs, ys) =
-        if count "[" xs > 0 && count "[" xs = count "]" xs then (xs, ys)
-        else
-            match l with
-            | head::tail -> loop tail (xs @ [head], tail)
-            | _ -> (xs, ys)
-
-    loop tokens ([], [])
-
-let rec parseExpr = function
-    | Expression (op, tail) -> Some(Set(op, parseArgs tail))
+let (|Datafile|_|) l = 
+    match l with
+    | Filename f :: tail -> Some(Data(f), tail)
     | _ -> None
-and parseArgs tokens =
-    match tokens with
-    | Expression (_) ->
-        // lookahead for the nearest expression end
-        let exprTokens, tail = splitExpr tokens
 
-        match parseExpr exprTokens with
-        | Some(exp) -> exp :: parseArgs tail
-        | None -> []
-
-    | Filename f :: tail -> Data(f) :: parseArgs tail
-    | _ -> []
+let rec (|Expression|_|) = function
+    | "[" :: Op op :: Args(args, tail) -> Some(Set(op, args), tail)
+    | _ -> None
+and (|Args|_|) s =
+    match s with
+    | "]" :: tail -> Some([], tail)
+    | Datafile(f, "]" :: tail) -> Some([f], tail)
+    | Datafile(f, Args(args, tail)) -> Some(f :: args, tail)
+    | Expression(e, Args(args, tail)) -> Some(e :: args, tail)
+    | _ -> None
 
 let loadFile name =
     let lines = List.ofSeq (System.IO.File.ReadLines(__SOURCE_DIRECTORY__ + "/" + name))
@@ -54,11 +42,10 @@ let loadFile name =
 let rec eval (exp: Expr) : Set<int> =
     match exp with
     | Data f -> loadFile f
-    | Set(_, []) -> Set.empty
-    | Set(_, [e]) -> eval e
     | Set(Sum, args) -> Set.unionMany (List.map eval args)
     | Set(Int, args) -> Set.intersectMany (List.map eval args)
     | Set(Diff, h::t) -> Set.difference (eval h) (Set.unionMany (List.map eval t))
+    | Set(_) -> Set.empty
 
 let tokenize (input: string) =
     List.ofArray (input.Split [|' '|])
