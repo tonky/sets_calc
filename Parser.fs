@@ -45,6 +45,3 @@ let rec eval (exp: Expr) : Set<int> =
     | Set(Int, args) -> Set.intersectMany (List.map eval args)
     | Set(Diff, h::t) -> Set.difference (eval h) (Set.unionMany (List.map eval t))
     | Set(_) -> Set.empty
-
-let tokenize (input: string) =
-    List.ofArray (input.Split [|' '|])

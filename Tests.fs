@@ -3,6 +3,9 @@ module Tests
 open Xunit
 open Parser
     
+let tokenize (input: string) =
+    List.ofArray (input.Split [|' '|])
+
 let checkParse str lst =
     match tokenize str with
     | Expression(exp, []) ->
