@@ -19,16 +19,14 @@ let (|Op|_|) = function
     | "DIF" -> Some(Diff)
     | _ -> None
 
-let (|Datafile|_|) l = 
-    match l with
+let (|Datafile|_|) = function
     | Filename f :: tail -> Some(Data(f), tail)
     | _ -> None
 
 let rec (|Expression|_|) = function
     | "[" :: Op op :: Args(args, tail) -> Some(Set(op, args), tail)
     | _ -> None
-and (|Args|_|) s =
-    match s with
+and (|Args|_|) = function
     | "]" :: tail -> Some([], tail)
     | Datafile(f, Args(args, tail)) -> Some(f :: args, tail)
     | Expression(e, Args(args, tail)) -> Some(e :: args, tail)
@@ -38,8 +36,7 @@ let loadFile name =
     let lines = List.ofSeq (System.IO.File.ReadLines(__SOURCE_DIRECTORY__ + "/" + name))
     Set.ofList (List.map Int32.Parse lines)
 
-let rec eval (exp: Expr) : Set<int> =
-    match exp with
+let rec eval = function
     | Data f -> loadFile f
     | Set(Sum, args) -> Set.unionMany (List.map eval args)
     | Set(Int, args) -> Set.intersectMany (List.map eval args)
