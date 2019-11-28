@@ -30,7 +30,6 @@ let rec (|Expression|_|) = function
 and (|Args|_|) s =
     match s with
     | "]" :: tail -> Some([], tail)
-    | Datafile(f, "]" :: tail) -> Some([f], tail)
     | Datafile(f, Args(args, tail)) -> Some(f :: args, tail)
     | Expression(e, Args(args, tail)) -> Some(e :: args, tail)
     | _ -> None
