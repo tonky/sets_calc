@@ -1,27 +1,26 @@
 module Parser
 
 open System
+open FParsec
 
-type Op = Sum | Int | Diff
+type Ops = Sum | Int | Diff
 
 type Expr = 
     | Data of string
-    | Set of Op * Expr list
+    | Set of Ops * Expr list
+    
+let parse str =
+    let evalue, evalueRef = createParserForwardedToRef<Expr, unit>()
 
-let (|Op|_|) = function
-    | "SUM" -> Some(Sum)
-    | "INT" -> Some(Int)
-    | "DIF" -> Some(Diff)
-    | _ -> None
+    let pop = stringReturn "SUM " Sum <|> stringReturn "INT " Int <|> stringReturn "DIF " Diff
+    let file = regex "\w+\.\w{3}" |>> Data
+    let set = between (pstring "[ ") (pstring "]") (pop .>>. many1 (file <|> evalue .>> spaces)) |>> Set
 
-let rec (|Expression|_|) = function
-    | "[" :: Op op :: Args(args, tail) -> Some(Set(op, args), tail)
-    | _ -> None
-and (|Args|_|) = function
-    | "]" :: tail -> Some([], tail)
-    | Expression(e, Args(args, tail)) -> Some(e :: args, tail)
-    | f :: Args(args, tail) -> Some(Data(f) :: args, tail)
-    | _ -> None
+    do evalueRef := choice [file; set]
+
+    match run set str with
+    | Success(result, _, _)   -> Some result
+    | Failure(errorMsg, _, _) -> printfn "Failure: %s" errorMsg; None
 
 let loadFile name =
     let lines = List.ofSeq (IO.File.ReadLines(__SOURCE_DIRECTORY__ + "/" + name))

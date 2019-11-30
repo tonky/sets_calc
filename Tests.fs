@@ -2,14 +2,13 @@ module Tests
 
 open Xunit
 open Parser
-    
+
 let tokenize (input: string) =
     List.ofArray (input.Split [|' '|])
 
 let checkParse str lst =
-    match tokenize str with
-    | Expression(exp, []) ->
-        Assert.True(Set.isEmpty (Set.difference (eval exp) (Set.ofList lst)))
+    match parse str with
+    | Some(exp) -> Assert.True(Set.isEmpty (Set.difference (eval exp) (Set.ofList lst)))
     | _ -> failwith("didn't parse")
 
 [<Fact>]
